@@ -1,7 +1,6 @@
+import { POST_COUNT } from "./env";
 import { callOpenAI } from "./openai";
 import { Product, SocialMediaPost } from "./types";
-
-const POST_COUNT = 5;
 
 export async function generateSocialMediaPosts(
   product: Product

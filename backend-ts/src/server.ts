@@ -5,9 +5,9 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { generateSocialMediaPosts } from "./generate";
 import { Product } from "./types";
+import { PORT } from "./env";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());

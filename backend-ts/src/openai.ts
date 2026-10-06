@@ -1,12 +1,13 @@
 import OpenAI from "openai";
 import { SocialMediaPost } from "./types";
+import { OPENAI_API_KEY } from "./env";
 
 let client: OpenAI | null = null;
 
 function getClient(): OpenAI {
   if (!client) {
     client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: OPENAI_API_KEY,
       timeout: 30000, // 30 second timeout
       maxRetries: 2,
     });

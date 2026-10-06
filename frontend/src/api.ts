@@ -1,3 +1,5 @@
+import { NEXT_PUBLIC_API_URL } from "./env";
+
 interface Product {
   name: string;
   description: string;
@@ -18,7 +20,7 @@ export async function generatePosts(
   product: Product
 ): Promise<GeneratePostsResponse> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/generate`,
+    `${NEXT_PUBLIC_API_URL}/api/generate`,
     {
       method: "POST",
       headers: {
