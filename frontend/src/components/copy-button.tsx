@@ -20,10 +20,7 @@ export const CopyButton = withStateMatch(
     .catch(chstate(STATE.ERROR)),
   {
     [STATE.IDLE]: ({ run, props: { label } }) => (
-      <ButtonGhostSm
-        aria-label={`Copy ${label} to clipboard`}
-        onClick={run}
-      >
+      <ButtonGhostSm aria-label={`Copy ${label} to clipboard`} onClick={run}>
         Copy
       </ButtonGhostSm>
     ),

@@ -15,7 +15,6 @@ const ICONS: Record<Theme, string> = {
   system: "🖥️",
 };
 
-/** Presentational toggle; all theme state lives in the {@link useTheme} context. */
 export function ThemeToggle() {
   const { theme, nextTheme, mounted, cycleTheme } = useTheme();
 
@@ -25,7 +24,6 @@ export function ThemeToggle() {
       onClick={cycleTheme}
       aria-label={`Theme: ${LABELS[theme]}. Switch to ${LABELS[nextTheme]}.`}
     >
-      {/* Plain span so the label inherits the button's white text. */}
       <span className="text-sm">
         {ICONS[theme]} {mounted ? LABELS[theme] : ""}
       </span>
