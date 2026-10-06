@@ -5,13 +5,13 @@ export const Label = atom<"label">(
 );
 
 export const Input = atom<"input">(
-  <input className="w-full px-3 py-2 border rounded-md" />
+  <input className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
 );
 
 export const Textarea = atom<"textarea">(
-  <textarea className="w-full px-3 py-2 border rounded-md" />
+  <textarea className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
 );
 
 export const Button = atom<"button">(
-  <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors" />
+  <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-500 disabled:bg-gray-400 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors" />
 );

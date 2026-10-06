@@ -13,6 +13,7 @@ import {
 } from "../components/atom/typography";
 import { Button, Input, Label, Textarea } from "../components/atom/form";
 import { Card } from "../components/atom/surface";
+import { ThemeToggle } from "../components/theme-toggle";
 
 interface Product {
   name: string;
@@ -48,7 +49,10 @@ export default function Home() {
 
   return (
     <Page>
-      <Heading1 className="mb-8">Social Media Post Generator</Heading1>
+      <Row className="mb-8 justify-between">
+        <Heading1 className="m-0">Social Media Post Generator</Heading1>
+        <ThemeToggle />
+      </Row>
 
       <Stack className="mb-8">
         <div>

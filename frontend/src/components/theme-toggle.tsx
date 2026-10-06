@@ -1,0 +1,34 @@
+"use client";
+
+import { Button } from "./atom/form";
+import { useTheme, type Theme } from "./theme-context";
+
+const LABELS: Record<Theme, string> = {
+  light: "Light",
+  dark: "Dark",
+  system: "System",
+};
+
+const ICONS: Record<Theme, string> = {
+  light: "☀️",
+  dark: "🌙",
+  system: "🖥️",
+};
+
+/** Presentational toggle; all theme state lives in the {@link useTheme} context. */
+export function ThemeToggle() {
+  const { theme, nextTheme, mounted, cycleTheme } = useTheme();
+
+  return (
+    <Button
+      type="button"
+      onClick={cycleTheme}
+      aria-label={`Theme: ${LABELS[theme]}. Switch to ${LABELS[nextTheme]}.`}
+    >
+      {/* Plain span so the label inherits the button's white text. */}
+      <span className="text-sm">
+        {ICONS[theme]} {mounted ? LABELS[theme] : ""}
+      </span>
+    </Button>
+  );
+}
