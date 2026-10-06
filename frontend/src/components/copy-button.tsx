@@ -15,9 +15,8 @@ export const CopyButton = withStateMatch(
   }) => navigator
     .clipboard
     .writeText(props.text)
-    .then(chstate(STATE.COPIED))
-    .then(() => setTimeout(chstate(STATE.IDLE), FLASH_MS))
-    .catch(chstate(STATE.ERROR)),
+    .then(chstate(STATE.COPIED), chstate(STATE.ERROR))
+    .then(() => setTimeout(chstate(STATE.IDLE), FLASH_MS)),
   {
     [STATE.IDLE]: ({ run, props: { label } }) => (
       <ButtonGhostSm aria-label={`Copy ${label} to clipboard`} onClick={run}>

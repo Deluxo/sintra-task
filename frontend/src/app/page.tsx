@@ -19,6 +19,8 @@ import { ThemeToggle } from "../components/theme-toggle";
 const GENERATE_POSTS_CACHE_KEY = 'cache.generatePosts';
 
 /** @TODO: move interfaces etc to better fitting file structure */
+/** @TODO: refactor <div><label><input></div> into a molecule */
+/** @TODO: refactor posts related components into posts domain file structure */
 
 interface Product {
   name: string;
