@@ -13,7 +13,10 @@ import {
 } from "../components/atom/typography";
 import { Button, Input, Label, Textarea } from "../components/atom/form";
 import { Card } from "../components/atom/surface";
+import { CopyButton } from "../components/copy-button";
 import { ThemeToggle } from "../components/theme-toggle";
+
+const GENERATE_POSTS_CACHE_KEY = 'cache.generatePosts';
 
 interface Product {
   name: string;
@@ -23,14 +26,14 @@ interface Product {
 }
 
 interface SocialMediaPost {
-  platform: "twitter" | "instagram" | "linkedin";
+  platform: "Twitter" | "Instagram" | "Linkedin";
   content: string;
 }
 
 const PLATFORM_ICONS = {
-  twitter: "𝕏",
-  instagram: "📷",
-  linkedin: "💼",
+  Twitter: "𝕏",
+  Instagram: "📷",
+  Linkedin: "💼",
 };
 
 export default function Home() {
@@ -40,10 +43,13 @@ export default function Home() {
     price: 0,
     category: "",
   });
-  const [posts, setPosts] = useState<SocialMediaPost[]>([]);
+  const [posts, setPosts] = useState<SocialMediaPost[]>(
+    JSON.parse(localStorage.getItem(GENERATE_POSTS_CACHE_KEY) || '{}')?.posts || []
+  );
 
   const handleGeneratePosts = async () => {
     const result = await generatePosts(product);
+    localStorage.setItem(GENERATE_POSTS_CACHE_KEY, JSON.stringify(result));
     setPosts(result.posts);
   };
 
@@ -109,10 +115,13 @@ export default function Home() {
           <Heading2>Generated Posts</Heading2>
           {posts.map((post, index) => (
             <Card key={index}>
-              <Row className="mb-2">
-                <Icon>{PLATFORM_ICONS[post.platform]}</Icon>
-                <Badge>{post.platform}</Badge>
-                <Caption>{post.content.length} chars</Caption>
+              <Row className="mb-2 justify-between">
+                <Row>
+                  <Icon>{PLATFORM_ICONS[post.platform]}</Icon>
+                  <Badge>{post.platform}</Badge>
+                  <Caption>{post.content.length} chars</Caption>
+                </Row>
+                <CopyButton text={post.content} label={`${post.platform} post`} />
               </Row>
               <Text>{post.content}</Text>
             </Card>

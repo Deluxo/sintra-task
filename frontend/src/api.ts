@@ -9,7 +9,7 @@ interface Product {
 
 interface GeneratePostsResponse {
   posts: Array<{
-    platform: "twitter" | "instagram" | "linkedin";
+    platform: "Twitter" | "Instagram" | "Linkedin";
     content: string;
   }>;
   generated_at: string;
