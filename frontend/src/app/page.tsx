@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 import { generatePosts } from "../api";
+import { Page, Row, Stack } from "../components/atom/layout";
+import {
+  Badge,
+  Caption,
+  Heading1,
+  Heading2,
+  Icon,
+  Text,
+} from "../components/atom/typography";
+import { Button, Input, Label, Textarea } from "../components/atom/form";
+import { Card } from "../components/atom/surface";
 
 interface Product {
   name: string;
@@ -36,15 +47,14 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Social Media Post Generator</h1>
+    <Page>
+      <Heading1 className="mb-8">Social Media Post Generator</Heading1>
 
-      <div className="space-y-4 mb-8">
+      <Stack className="mb-8">
         <div>
-          <label className="block text-sm font-medium mb-2">Product Name</label>
-          <input
+          <Label>Product Name</Label>
+          <Input
             type="text"
-            className="w-full px-3 py-2 border rounded-md"
             value={product.name}
             onChange={(e) => setProduct({ ...product, name: e.target.value })}
             placeholder="EcoBottle Pro"
@@ -52,9 +62,8 @@ export default function Home() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Description</label>
-          <textarea
-            className="w-full px-3 py-2 border rounded-md"
+          <Label>Description</Label>
+          <Textarea
             rows={4}
             value={product.description}
             onChange={(e) =>
@@ -65,10 +74,9 @@ export default function Home() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Price</label>
-          <input
+          <Label>Price</Label>
+          <Input
             type="number"
-            className="w-full px-3 py-2 border rounded-md"
             value={product.price}
             onChange={(e) =>
               setProduct({ ...product, price: parseFloat(e.target.value) || 0 })
@@ -78,12 +86,9 @@ export default function Home() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Category (optional)
-          </label>
-          <input
+          <Label>Category (optional)</Label>
+          <Input
             type="text"
-            className="w-full px-3 py-2 border rounded-md"
             value={product.category || ""}
             onChange={(e) =>
               setProduct({ ...product, category: e.target.value })
@@ -91,43 +96,25 @@ export default function Home() {
             placeholder="Health & Wellness"
           />
         </div>
-      </div>
+      </Stack>
 
-      <button
-        onClick={handleGeneratePosts}
-        className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-      >
-        Generate Posts
-      </button>
+      <Button onClick={handleGeneratePosts}>Generate Posts</Button>
 
       {posts.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold mb-4">Generated Posts</h2>
-          <div className="space-y-4">
-            {posts.map((post, index) => (
-              <div
-                key={index}
-                className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">
-                    {PLATFORM_ICONS[post.platform]}
-                  </span>
-                  <span className="font-medium text-sm text-gray-600 capitalize">
-                    {post.platform}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {post.content.length} chars
-                  </span>
-                </div>
-                <p className="text-gray-800 whitespace-pre-wrap">
-                  {post.content}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Stack className="mt-8">
+          <Heading2>Generated Posts</Heading2>
+          {posts.map((post, index) => (
+            <Card key={index}>
+              <Row className="mb-2">
+                <Icon>{PLATFORM_ICONS[post.platform]}</Icon>
+                <Badge>{post.platform}</Badge>
+                <Caption>{post.content.length} chars</Caption>
+              </Row>
+              <Text>{post.content}</Text>
+            </Card>
+          ))}
+        </Stack>
       )}
-    </main>
+    </Page>
   );
 }
