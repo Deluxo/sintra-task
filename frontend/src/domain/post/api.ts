@@ -1,12 +1,5 @@
-import { NEXT_PUBLIC_API_URL } from "./env";
-import type { SocialMediaPost } from "./domain/post/model";
-
-interface Product {
-  name: string;
-  description: string;
-  price: number;
-  category?: string;
-}
+import { NEXT_PUBLIC_API_URL } from "../../env";
+import type { Product, SocialMediaPost } from "./model";
 
 interface GeneratePostsResponse {
   posts: SocialMediaPost[];
