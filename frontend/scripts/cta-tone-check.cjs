@@ -115,7 +115,6 @@ async function main() {
   const buttons = () => Array.from(document.querySelectorAll("button"));
   const textOf = (el) => (el ? el.textContent.trim() : "");
   const byText = (exact) => buttons().find((b) => textOf(b) === exact);
-  const byTitle = (title) => document.querySelector(`[title="${title}"]`);
   const click = (el) =>
     el.dispatchEvent(new dom.window.MouseEvent("click", { bubbles: true, cancelable: true }));
   const setValue = (el, value) => {
@@ -206,23 +205,24 @@ async function main() {
     JSON.stringify(cached?.ctaTone)
   );
 
-  // --- backend validation surfaces ---
+  // --- backend validation surfaces, then auto-clears back to idle ---
   click(byText("Generate Posts"));
   const errBtn = await waitFor(
     () => buttons().find((b) => /Product name is required/.test(textOf(b))),
     15000
   );
   check("400 surfaces on the button", !!errBtn, textOf(errBtn));
-  check("error is a retry button", !!byTitle("Click to retry"));
+  const idleAgain = await waitFor(() => byText("Generate Posts"), 8000);
+  check("error auto-clears back to idle", !!idleAgain);
 
-  // --- retry with a valid product ---
+  // --- generate with a valid product ---
   setValue(document.querySelector('input[placeholder="EcoBottle Pro"]'), "EcoBottle Pro");
   setValue(
     document.querySelector('textarea[placeholder^="Revolutionary reusable"]'),
     "Reusable water bottle with UV purification."
   );
   setValue(document.querySelector('input[placeholder="49.99"]'), "49.99");
-  click(byTitle("Click to retry"));
+  click(byText("Generate Posts"));
 
   const generated = await waitFor(
     () => document.body.textContent.includes("Generated Posts"),
@@ -233,8 +233,7 @@ async function main() {
     "retry generates posts",
     !!generated,
     generated ? undefined : `no posts within 90s — is the backend up at ${NEXT_PUBLIC_API_URL}?`
-  );
-  if (generated) {
+  );  if (generated) {
     check("twitter card rendered", document.body.textContent.includes("Twitter/X"));
     check("character counters rendered", /chars/.test(document.body.textContent));
 

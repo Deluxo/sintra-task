@@ -62,8 +62,8 @@ The feature needed a trustworthy pipeline to sit on, so these shipped together:
   user instructions stay untrusted payload.
 - **Frontend error surfacing** — `api.ts` checked neither `response.ok` nor the
   error body; it now throws `ApiError` with the backend's message and field
-  detail, and the generate button shows it and acts as a **retry button**
-  (previously errors auto-vanished after 5s, racing a fresh request).
+  detail, which the generate button displays before its existing 5-second
+  auto-clear.
 - **Platform identity** — backend typed `platform` as `'twitter' | …` while the
   frontend model claimed `"Twitter" | "Linkedin"` and keyed icons off it. One
   `PLATFORM_META` map + `toPlatform()` now own display names, icons and cache
@@ -82,9 +82,9 @@ The feature needed a trustworthy pipeline to sit on, so these shipped together:
   (`scripts/cta-tone-check.cjs`) renders the real page, drives it like a user
   and asserts 23 checks: tone switching, override written/count shown,
   override cleared by a default change, all toggles, the character counter,
-  localStorage persistence, a `400` surfacing on the button as a retryable
-  error, and a **real generation** asserting the preferences arrive in the
-  request body. Needs the backend on `:3001`.
+  localStorage persistence, a `400` surfacing on the button and auto-clearing
+  back to idle, and a **real generation** asserting the preferences arrive in
+  the request body. Needs the backend on `:3001`.
 - Manual `curl` matrix against the backend: missing name, string price, bad
   tone value, >300-char instructions, malformed JSON, oversized body, plus a
   real generation with an Instagram tone override (verified the override and
