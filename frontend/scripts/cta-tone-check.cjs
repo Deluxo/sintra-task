@@ -149,20 +149,24 @@ async function main() {
   check("tone switches to playful", byText("Playful")?.getAttribute("aria-pressed") === "true");
 
   // --- per-platform overrides ---
-  const disclosure = buttons().find((b) => /^Customize/.test(textOf(b)));
-  click(disclosure);
-  await waitFor(() => document.querySelectorAll("select").length === 3);
+  const disclosureSummary = Array.from(document.querySelectorAll("summary")).find(
+    (s) => /^Customize/.test(textOf(s))
+  );
+  const disclosureDetails = disclosureSummary.parentElement;
+  click(disclosureSummary);
+  await waitFor(() => disclosureDetails.hasAttribute("open"));
+  check("disclosure opens on click", disclosureDetails.hasAttribute("open"));
   const igSelect = document.querySelector('select[aria-label="Instagram tone"]');
-  check("three platform selects appear", document.querySelectorAll("select").length === 3);
+  check("three platform selects present", document.querySelectorAll("select").length === 3);
   check("select starts at default", igSelect?.value === "__default__");
 
   igSelect.value = "professional";
   igSelect.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
-  // While expanded the disclosure reads "Hide (1)"; the count is what matters.
+  // The summary reads "Customize (1)" once an override is applied.
   // Waiting for it also proves React re-rendered with the override applied.
   const disclosureText = await waitFor(() => {
-    const el = buttons().find((b) => /^(Customize|Hide)/.test(textOf(b)));
-    return /\(1\)/.test(textOf(el)) ? textOf(el) : null;
+    const text = textOf(disclosureSummary);
+    return /\(1\)/.test(text) ? text : null;
   });
   check("disclosure shows override count", !!disclosureText, disclosureText || "no count");
   check(

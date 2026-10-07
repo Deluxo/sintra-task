@@ -13,6 +13,7 @@
   "dependencies": {
     "@synergyeffect/react-atom": "^1.0.4",
     "@synergyeffect/with-state-match": "^1.1.4",
+    "fp-ts": "^2.16.11",
     "next": "15.1.0",
     "react": "19.3",
     "react-dom": "19.3"
