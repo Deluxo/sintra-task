@@ -16,7 +16,7 @@ export default function Home() {
       </Row>
 
       <ProductForm />
-      <GeneratePostsButton />
+      <GeneratePostsButton className="w-full"/>
 
       <PostsCard className="mt-8" />
     </Page>

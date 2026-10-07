@@ -5,24 +5,28 @@ import { withStateMatch } from "@synergyeffect/with-state-match";
 import { Button, ButtonDanger } from "../../components/atom/form";
 import { useProduct } from "../product/useProduct";
 import { usePosts } from "./usePosts";
+import { ComponentProps } from "react";
 
 const STATE = mkEnumObject("IDLE", "GENERATING", "ERROR");
 
 export const GeneratePostsButton = withStateMatch(
   STATE.IDLE,
-  ({ chstate }, { product }, { generatePosts }) => Promise.resolve(product)
+  ({ chstate }: {
+    chstate: (state: keyof typeof STATE) => (data: any) => typeof data,
+    props?: ComponentProps<"button">
+  }, { product }, { generatePosts }) => Promise.resolve(product)
     .then(chstate(STATE.GENERATING))
     .then(generatePosts)
     .then(chstate(STATE.IDLE))
     .catch(chstate(STATE.ERROR))
     .finally(() => setTimeout(chstate(STATE.IDLE), 5000)),
   {
-    [STATE.IDLE]: ({ run }) => {
+    [STATE.IDLE]: ({ run, props }) => {
       const productHook = useProduct();
       const postHook = usePosts();
-      return <Button onClick={() => run(productHook, postHook)}>Generate Posts</Button>;
+      return <Button {...props} onClick={() => run(productHook, postHook)}>Generate Posts</Button>;
     },
-    [STATE.GENERATING]: () => <Button disabled>Generating…</Button>,
-    [STATE.ERROR]: (a) => <ButtonDanger>{a?.stateData?.message}</ButtonDanger>,
+    [STATE.GENERATING]: ({ props }) => <Button {...props} disabled>Generating…</Button>,
+    [STATE.ERROR]: ({ stateData, props }) => <ButtonDanger {...props}>{stateData?.message}</ButtonDanger>,
   }
 );
