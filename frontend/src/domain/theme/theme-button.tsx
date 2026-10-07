@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "./atom/form";
-import { useTheme, type Theme } from "./theme-context";
+import { Button } from "../../components/atom/form";
+import { useTheme, type Theme } from "./context";
 
 const LABELS: Record<Theme, string> = {
   light: "Light",
@@ -15,7 +15,7 @@ const ICONS: Record<Theme, string> = {
   system: "🖥️",
 };
 
-export function ThemeToggle() {
+export function ThemeButton() {
   const { theme, nextTheme, mounted, cycleTheme } = useTheme();
 
   return (

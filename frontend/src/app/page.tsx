@@ -14,7 +14,7 @@ import {
 import { Button, Input, Label, Textarea } from "../components/atom/form";
 import { Card } from "../components/atom/surface";
 import { CopyButton } from "../components/copy-button";
-import { ThemeToggle } from "../components/theme-toggle";
+import { ThemeButton } from "../domain/theme/theme-button";
 import { pipe } from "fp-ts/lib/function";
 
 const GENERATE_POSTS_CACHE_KEY = 'cache.generatePosts';
@@ -73,7 +73,7 @@ export default function Home() {
     <Page>
       <Row className="mb-8 justify-between">
         <Heading1 className="m-0">Social Media Post Generator</Heading1>
-        <ThemeToggle />
+        <ThemeButton />
       </Row>
 
       <Stack className="mb-8">

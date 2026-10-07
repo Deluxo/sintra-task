@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { ThemeProvider } from '../components/theme-context'
+import { ThemeProvider } from '../domain/theme/context'
 
 export const metadata: Metadata = {
   title: 'Social Media Post Generator',
