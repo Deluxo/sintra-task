@@ -31,7 +31,6 @@ import { usePosts } from "./usePosts";
 
 const PLATFORM_ORDER = Object.keys(PLATFORM_META) as Platform[];
 
-/** Value used by the select to mean "no override, follow the default tone". */
 const DEFAULT_OPTION = "__default__";
 
 export function CtaToneForm(props: ComponentProps<"div">) {
@@ -103,8 +102,6 @@ export function CtaToneForm(props: ComponentProps<"div">) {
                     }
                     onChange={(event) => {
                       const next = event.target.value;
-                      // Picking the default (or the value already in effect)
-                      // means the platform should simply follow the default tone.
                       if (next === DEFAULT_OPTION || next === ctaTone.tone) {
                         clearPlatformTone(platform);
                       } else {
@@ -135,54 +132,56 @@ export function CtaToneForm(props: ComponentProps<"div">) {
         )}
       </div>
 
-      <div>
-        <Label>Emoji usage</Label>
-        <SegmentedControl role="group" aria-label="Emoji usage">
-          {EMOJI_OPTIONS.map((option) => {
-            const selected = option.value === ctaTone.emoji;
-            const Item = selected ? SegmentedItemSelected : SegmentedItem;
-            return (
-              <Item
-                key={option.value}
-                aria-pressed={selected}
-                onClick={() => patchCtaTone({ emoji: option.value })}
-              >
-                {option.label}
-              </Item>
-            );
-          })}
-        </SegmentedControl>
-      </div>
-
-      <div>
-        <Label>Post length</Label>
-        <SegmentedControl role="group" aria-label="Post length">
-          {LENGTH_OPTIONS.map((option) => {
-            const selected = option.value === ctaTone.length;
-            const Item = selected ? SegmentedItemSelected : SegmentedItem;
-            return (
-              <Item
-                key={option.value}
-                aria-pressed={selected}
-                onClick={() => patchCtaTone({ length: option.value })}
-              >
-                {option.label}
-              </Item>
-            );
-          })}
-        </SegmentedControl>
-      </div>
-
       <Row>
-        <Toggle
-          id={ctaToggleId}
-          checked={ctaTone.includeCta}
-          onCheckedChange={(checked) => patchCtaTone({ includeCta: checked })}
-          label="Add a call-to-action to every post"
-        />
-        <Label htmlFor={ctaToggleId} className="mb-0 cursor-pointer">
-          Add a call-to-action to every post
-        </Label>
+        <div>
+          <Label>Emoji usage</Label>
+          <SegmentedControl role="group" aria-label="Emoji usage">
+            {EMOJI_OPTIONS.map((option) => {
+              const selected = option.value === ctaTone.emoji;
+              const Item = selected ? SegmentedItemSelected : SegmentedItem;
+              return (
+                <Item
+                  key={option.value}
+                  aria-pressed={selected}
+                  onClick={() => patchCtaTone({ emoji: option.value })}
+                >
+                  {option.label}
+                </Item>
+              );
+            })}
+          </SegmentedControl>
+        </div>
+
+        <div>
+          <Label>Post length</Label>
+          <SegmentedControl role="group" aria-label="Post length">
+            {LENGTH_OPTIONS.map((option) => {
+              const selected = option.value === ctaTone.length;
+              const Item = selected ? SegmentedItemSelected : SegmentedItem;
+              return (
+                <Item
+                  key={option.value}
+                  aria-pressed={selected}
+                  onClick={() => patchCtaTone({ length: option.value })}
+                >
+                  {option.label}
+                </Item>
+              );
+            })}
+          </SegmentedControl>
+        </div>
+
+        <div>
+          <Label htmlFor={ctaToggleId} className="cursor-pointer">
+            Add a call-to-action
+          </Label>
+          <Toggle
+            id={ctaToggleId}
+            checked={ctaTone.includeCta}
+            onCheckedChange={(checked) => patchCtaTone({ includeCta: checked })}
+            label="Add a call-to-action to every post"
+          />
+        </div>
       </Row>
 
       <FormControlRow
