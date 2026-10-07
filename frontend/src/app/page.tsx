@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { generatePosts } from "../api";
 import { Page, Row, Stack } from "../components/atom/layout";
 import {
@@ -15,6 +15,7 @@ import { Button, Input, Label, Textarea } from "../components/atom/form";
 import { Card } from "../components/atom/surface";
 import { CopyButton } from "../components/copy-button";
 import { ThemeToggle } from "../components/theme-toggle";
+import { pipe } from "fp-ts/lib/function";
 
 const GENERATE_POSTS_CACHE_KEY = 'cache.generatePosts';
 
@@ -47,15 +48,26 @@ export default function Home() {
     price: 0,
     category: "",
   });
-  const [posts, setPosts] = useState<SocialMediaPost[]>(
-    JSON.parse(localStorage.getItem(GENERATE_POSTS_CACHE_KEY) || '{}')?.posts || []
-  );
+
+  const [posts, setPosts] = useState<SocialMediaPost[]>([]);
 
   const handleGeneratePosts = async () => {
     const result = await generatePosts(product);
     localStorage.setItem(GENERATE_POSTS_CACHE_KEY, JSON.stringify(result));
     setPosts(result.posts);
   };
+
+  useLayoutEffect(() => {
+    if (!window || posts?.length) return;
+
+    pipe(
+      GENERATE_POSTS_CACHE_KEY,
+      a => localStorage.getItem(a) || '{}',
+      a => JSON.parse(a),
+      a => a?.posts,
+      setPosts,
+    )
+  }, [posts, setPosts])
 
   return (
     <Page>
