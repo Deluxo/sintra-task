@@ -1,5 +1,6 @@
 import { NEXT_PUBLIC_API_URL } from "../../env";
-import type { Product, SocialMediaPost } from "./model";
+import type { Product } from "../product/model";
+import type { SocialMediaPost } from "./model";
 
 interface GeneratePostsResponse {
   posts: SocialMediaPost[];

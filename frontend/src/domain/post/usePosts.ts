@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { PostsContext } from "./context";
 import { generatePosts as requestGeneratePosts } from "./api";
-import type { Product } from "./model";
+import type { Product } from "../product/model";
 
 export function usePosts() {
   const context = useContext(PostsContext);

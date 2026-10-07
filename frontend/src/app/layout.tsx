@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { ThemeProvider } from '../domain/theme/context'
 import { PostsProvider } from '../domain/post/context'
+import { ProductProvider } from '../domain/product/context'
 
 export const metadata: Metadata = {
   title: 'Social Media Post Generator',
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <PostsProvider>{children}</PostsProvider>
+          <PostsProvider>
+            <ProductProvider>{children}</ProductProvider>
+          </PostsProvider>
         </ThemeProvider>
       </body>
     </html>
