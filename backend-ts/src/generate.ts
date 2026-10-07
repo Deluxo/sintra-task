@@ -25,8 +25,5 @@ ${product.category ? `Category: ${product.category}` : ""}
 ${buildCtaToneFragment(ctaTone)}
 
 Include posts for Twitter, Instagram and LinkedIn.
-
-Format the response as a JSON object, where the key is "posts" and the value is an array of objects.
-Each object should have "platform" and "content" properties.
 `;
 }
