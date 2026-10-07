@@ -11,11 +11,27 @@ export function ProductForm(props: ComponentProps<"div">) {
 
   return (
     <Stack {...props}>
-      <FormControlRow label="Product Name" inputProps={{
-        onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, name: e.target.value }),
-        value: product.name,
-        placeholder: "EcoBottle Pro",
-      }} />
+      <Row className="space-x-2">
+        <FormControlRow className="grow" label="Product Name" inputProps={{
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, name: e.target.value }),
+          value: product.name,
+          placeholder: "EcoBottle Pro",
+        }} />
+
+        <FormControlRow label="Category (optional)" inputProps={{
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, category: e.target.value }),
+          value: product.category || "",
+          placeholder: "Health & Wellness",
+        }} />
+
+        <FormControlRow label="Price" inputProps={{
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, price: parseFloat(e.target.value) || 0 }),
+          type: "number",
+          value: product.price,
+          placeholder: "49.99",
+        }} />
+
+      </Row>
 
       <FormControlRow label="Description" InputComponent={Textarea} inputProps={{
         onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setProduct({ ...product, description: e.target.value }),
@@ -23,21 +39,6 @@ export function ProductForm(props: ComponentProps<"div">) {
         placeholder: "Revolutionary reusable water bottle with built-in UV purification...",
         rows: 4,
       }} />
-
-      <Row className="space-x-2">
-        <FormControlRow className="grow" label="Price" inputProps={{
-          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, price: parseFloat(e.target.value) || 0 }),
-          type: "number",
-          value: product.price,
-          placeholder: "49.99",
-        }} />
-
-        <FormControlRow className="grow" label="Category (optional)" inputProps={{
-          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, category: e.target.value }),
-          value: product.category || "",
-          placeholder: "Health & Wellness",
-        }} />
-      </Row>
 
     </Stack>
   );
