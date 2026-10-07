@@ -10,7 +10,7 @@ const STATE = mkEnumObject('IDLE', 'COPIED', 'ERROR');
 export const CopyButton = withStateMatch(
   STATE.IDLE,
   ({ chstate, props }: {
-    chstate: (next: keyof typeof STATE) => () => any | null,
+    chstate: (next: keyof typeof STATE) => (data?: unknown) => unknown,
     props: { text: string; label: string }
   }) => navigator
     .clipboard
