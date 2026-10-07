@@ -2,17 +2,12 @@
 
 import { Page, Row } from "../components/atom/layout";
 import { Heading1 } from "../components/atom/typography";
-import { Button } from "../components/atom/form";
 import { ThemeButton } from "../domain/theme/theme-button";
-import { usePosts } from "../domain/post/usePosts";
+import { GeneratePostsButton } from "../domain/post/GeneratePostsButton";
 import { PostsCard } from "../domain/post/PostsCard";
-import { useProduct } from "../domain/product/useProduct";
 import { ProductForm } from "../domain/product/ProductForm";
 
 export default function Home() {
-  const { product } = useProduct();
-  const { generatePosts } = usePosts();
-
   return (
     <Page className="space-y-8">
       <Row className="justify-between">
@@ -21,9 +16,7 @@ export default function Home() {
       </Row>
 
       <ProductForm />
-      <Button onClick={() => generatePosts(product)}>
-        Generate Posts
-      </Button>
+      <GeneratePostsButton />
 
       <PostsCard className="mt-8" />
     </Page>
