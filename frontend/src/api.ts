@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_API_URL } from "./env";
+import type { SocialMediaPost } from "./domain/post/model";
 
 interface Product {
   name: string;
@@ -8,10 +9,7 @@ interface Product {
 }
 
 interface GeneratePostsResponse {
-  posts: Array<{
-    platform: "Twitter" | "Instagram" | "Linkedin";
-    content: string;
-  }>;
+  posts: SocialMediaPost[];
   generated_at: string;
   count: number;
 }

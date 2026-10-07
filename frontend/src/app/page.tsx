@@ -1,27 +1,16 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { generatePosts } from "../api";
 import { Page, Row, Stack } from "../components/atom/layout";
-import {
-  Badge,
-  Caption,
-  Heading1,
-  Heading2,
-  Icon,
-  Text,
-} from "../components/atom/typography";
+import { Heading1 } from "../components/atom/typography";
 import { Button, Input, Label, Textarea } from "../components/atom/form";
-import { Card } from "../components/atom/surface";
-import { CopyButton } from "../components/copy-button";
 import { ThemeButton } from "../domain/theme/theme-button";
-import { pipe } from "fp-ts/lib/function";
-
-const GENERATE_POSTS_CACHE_KEY = 'cache.generatePosts';
+import { usePosts } from "../domain/post/usePosts";
+import { PostsCard } from "../domain/post/PostsCard";
 
 /** @TODO: move interfaces etc to better fitting file structure */
 /** @TODO: refactor <div><label><input></div> into a molecule */
-/** @TODO: refactor posts related components into posts domain file structure */
 
 interface Product {
   name: string;
@@ -29,17 +18,6 @@ interface Product {
   price: number;
   category?: string;
 }
-
-interface SocialMediaPost {
-  platform: "Twitter" | "Instagram" | "Linkedin";
-  content: string;
-}
-
-const PLATFORM_ICONS = {
-  Twitter: "𝕏",
-  Instagram: "📷",
-  Linkedin: "💼",
-};
 
 export default function Home() {
   const [product, setProduct] = useState<Product>({
@@ -49,25 +27,12 @@ export default function Home() {
     category: "",
   });
 
-  const [posts, setPosts] = useState<SocialMediaPost[]>([]);
+  const { setPosts } = usePosts();
 
   const handleGeneratePosts = async () => {
     const result = await generatePosts(product);
-    localStorage.setItem(GENERATE_POSTS_CACHE_KEY, JSON.stringify(result));
     setPosts(result.posts);
   };
-
-  useLayoutEffect(() => {
-    if (!window || posts?.length) return;
-
-    pipe(
-      GENERATE_POSTS_CACHE_KEY,
-      a => localStorage.getItem(a) || '{}',
-      a => JSON.parse(a),
-      a => a?.posts,
-      setPosts,
-    )
-  }, [posts, setPosts])
 
   return (
     <Page>
@@ -126,24 +91,7 @@ export default function Home() {
 
       <Button onClick={handleGeneratePosts}>Generate Posts</Button>
 
-      {posts.length > 0 && (
-        <Stack className="mt-8">
-          <Heading2>Generated Posts</Heading2>
-          {posts.map((post, index) => (
-            <Card key={index}>
-              <Row className="mb-2 justify-between">
-                <Row>
-                  <Icon>{PLATFORM_ICONS[post.platform]}</Icon>
-                  <Badge>{post.platform}</Badge>
-                  <Caption>{post.content.length} chars</Caption>
-                </Row>
-                <CopyButton text={post.content} label={`${post.platform} post`} />
-              </Row>
-              <Text>{post.content}</Text>
-            </Card>
-          ))}
-        </Stack>
-      )}
+      <PostsCard className="mt-8"/>
     </Page>
   );
 }
