@@ -16,7 +16,7 @@ function getClient(): OpenAI {
   if (!client) {
     client = new OpenAI({
       apiKey: OPENAI_API_KEY,
-      timeout: 30000, // 30 second timeout
+      timeout: 30000,
       maxRetries: 2,
     });
   }

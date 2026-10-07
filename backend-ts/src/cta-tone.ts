@@ -27,9 +27,7 @@ const overridesSchema = z.object({
 });
 
 export const ctaToneSchema = z.object({
-  /** Default tone for every platform. Changing it clears all overrides. */
   tone: toneSchema,
-  /** Per-platform tones, only present when a platform was edited individually. */
   overrides: overridesSchema.optional(),
   emoji: emojiLevelSchema.default("subtle"),
   length: postLengthSchema.default("standard"),
@@ -60,7 +58,6 @@ export const effectiveTone = (
   platform: Platform
 ): Tone => ctaTone.overrides?.[platform] ?? ctaTone.tone;
 
-/** Share of each platform's character limit the generated posts must stay within. */
 const LENGTH_SHARE: Record<PostLength, number> = {
   concise: 0.5,
   standard: 0.85,
@@ -73,10 +70,6 @@ const EMOJI_RULES: Record<EmojiLevel, string> = {
   heavy: "Use emojis liberally where they fit.",
 };
 
-/**
- * Renders the cta-tone preferences as prompt instructions.
- * Tone is collapsed to a single line when every platform resolves to the same one.
- */
 export function buildCtaToneFragment(ctaTone: CtaTonePreferences): string {
   const resolved = PLATFORMS.map((platform) => ({
     platform,
@@ -88,8 +81,8 @@ export function buildCtaToneFragment(ctaTone: CtaTonePreferences): string {
     tones.length === 1
       ? `Tone: ${tones[0]}.`
       : `Tone per platform: ${resolved
-          .map((entry) => `${entry.platform} = ${entry.tone}`)
-          .join(", ")}.`;
+        .map((entry) => `${entry.platform} = ${entry.tone}`)
+        .join(", ")}.`;
 
   const lengthLine = `Stay within these character limits: ${PLATFORMS.map(
     (platform) => {

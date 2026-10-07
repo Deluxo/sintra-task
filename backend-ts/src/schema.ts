@@ -14,6 +14,7 @@ export const productSchema = z.object({
     .trim()
     .min(1, "Product name is required")
     .max(MAX.name, `Product name must be ${MAX.name} characters or fewer`),
+
   description: z
     .string()
     .trim()
@@ -22,10 +23,12 @@ export const productSchema = z.object({
       MAX.description,
       `Product description must be ${MAX.description} characters or fewer`
     ),
+
   price: z
     .number({ invalid_type_error: "Price must be a number" })
     .finite("Price must be a number")
     .min(0, "Price cannot be negative"),
+
   category: z.string().trim().max(MAX.category, `Category must be ${MAX.category} characters or fewer`).optional(),
 });
 
@@ -36,7 +39,6 @@ export const generateRequestSchema = z.object({
 
 export type GenerateRequest = z.infer<typeof generateRequestSchema>;
 
-/** Shape-checks the raw model payload before platforms are normalised. */
 export const llmResponseSchema = z.object({
   posts: z
     .array(z.object({ platform: z.string(), content: z.string() }))
@@ -45,10 +47,6 @@ export const llmResponseSchema = z.object({
 
 export type LlmResponse = z.infer<typeof llmResponseSchema>;
 
-/**
- * The model is told to use lowercase platform keys but may capitalise or hyphenate
- * them anyway, so normalise before matching against the platform enum.
- */
 const normalizePlatformKey = (value: string): string =>
   value.trim().toLowerCase().replace(/[\s\-/_.]/g, "");
 
@@ -65,7 +63,6 @@ const postSchema = z.object({
   content: z.string().trim().min(1),
 });
 
-/** Maps raw model posts onto the platform enum, silently dropping malformed entries. */
 export function normalizeGeneratedPosts(posts: LlmResponse["posts"]): SocialMediaPost[] {
   return posts
     .map((post) => ({
@@ -75,7 +72,6 @@ export function normalizeGeneratedPosts(posts: LlmResponse["posts"]): SocialMedi
     .filter((post): post is SocialMediaPost => postSchema.safeParse(post).success);
 }
 
-/** Flattens a ZodError into `{ "product.name": "Product name is required" }`. */
 export function toFieldErrors(error: z.ZodError): Record<string, string> {
   return error.issues.reduce<Record<string, string>>((carry, issue) => {
     const path = issue.path.join(".") || "request";
