@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { generateSocialMediaPosts } from "./generate";
-import { Product } from "./types";
+import { generateRequestSchema, toFieldErrors } from "./schema";
 import { PORT } from "./env";
 
 const app = express();
@@ -18,15 +18,45 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Generate social media posts
-app.post("/api/generate", async (req: Request, res: Response) => {
-  const product: Product = req.body.product;
+app.post("/api/generate", async (req: Request, res: Response, next: NextFunction) => {
+  const parsed = generateRequestSchema.safeParse(req.body);
 
-  const posts = await generateSocialMediaPosts(product);
+  if (!parsed.success) {
+    res.status(400).json({
+      error: {
+        message: "Invalid request",
+        fields: toFieldErrors(parsed.error),
+      },
+    });
+    return;
+  }
 
-  res.json({
-    posts,
-    generated_at: new Date().toISOString(),
-    count: posts.length,
+  const { product, ctaTone } = parsed.data;
+
+  try {
+    const posts = await generateSocialMediaPosts(product, ctaTone);
+
+    res.json({
+      posts,
+      generated_at: new Date().toISOString(),
+      count: posts.length,
+    });
+  } catch (error) {
+    // Express 4 does not forward rejected promises from async handlers.
+    next(error);
+  }
+});
+
+// Express only forwards errors thrown synchronously, so async handlers need
+// their own catch — otherwise the request hangs until the client times out.
+app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) return next(error);
+
+  console.error(error);
+  res.status(500).json({
+    error: {
+      message: error instanceof Error ? error.message : "Failed to generate posts",
+    },
   });
 });
 

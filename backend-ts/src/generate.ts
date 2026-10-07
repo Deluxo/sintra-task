@@ -1,18 +1,20 @@
 import { POST_COUNT } from "./env";
 import { callOpenAI } from "./openai";
+import { buildCtaToneFragment, CtaTonePreferences, DEFAULT_CTA_TONE } from "./cta-tone";
 import { Product, SocialMediaPost } from "./types";
 
 export async function generateSocialMediaPosts(
-  product: Product
+  product: Product,
+  ctaTone: CtaTonePreferences = DEFAULT_CTA_TONE
 ): Promise<SocialMediaPost[]> {
-  const prompt = buildPrompt(product);
+  const prompt = buildPrompt(product, ctaTone);
 
   const posts = await callOpenAI(prompt);
 
   return posts;
 }
 
-function buildPrompt(product: Product): string {
+function buildPrompt(product: Product, ctaTone: CtaTonePreferences): string {
   return `Generate ${POST_COUNT} social media posts for this product:
 
 Product: ${product.name}
@@ -20,12 +22,11 @@ Description: ${product.description}
 Price: $${product.price}
 ${product.category ? `Category: ${product.category}` : ""}
 
-Format each post as:
-Platform: Content
+${buildCtaToneFragment(ctaTone)}
 
-Include posts for Twitter, Instagram, and LinkedIn. Use emojis and make them engaging.
+Include posts for Twitter, Instagram and LinkedIn.
 
-Return response as JSON object, where the key is "posts" and the value is an array of objects.
+Format the response as a JSON object, where the key is "posts" and the value is an array of objects.
 Each object should have "platform" and "content" properties.
 `;
 }
