@@ -1,9 +1,41 @@
+import type { TONE_OPTIONS, Tone } from "./cta-tone";
+
 export type Platform = "twitter" | "instagram" | "linkedin";
 
 export interface SocialMediaPost {
   platform: Platform;
   content: string;
 }
+
+export type ToneOption = (typeof TONE_OPTIONS)[number];
+
+export type ChoiceOption<T extends string> = {
+  value: T;
+  label: string;
+};
+
+export type ToneChipProps = {
+  option: ToneOption;
+  selected: boolean;
+  onSelect: (tone: Tone) => void;
+};
+
+export type PlatformToneRowProps = {
+  platform: Platform;
+};
+
+export type SegmentedOptionProps<T extends string> = {
+  option: ChoiceOption<T>;
+  selected: boolean;
+  onSelect: (value: T) => void;
+};
+
+export type SegmentedFieldProps<T extends string> = {
+  label: string;
+  options: readonly ChoiceOption<T>[];
+  value: T;
+  onSelect: (value: T) => void;
+};
 
 /** Display names and icons for every platform a post can belong to. */
 export const PLATFORM_META: Record<Platform, { label: string; icon: string }> = {

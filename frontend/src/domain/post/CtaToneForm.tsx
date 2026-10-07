@@ -16,7 +16,14 @@ import {
   Toggle,
 } from "../../components/atom/form";
 import { FormControlRow } from "../../components/atom/molecule/FormControl";
-import { PLATFORM_META, type Platform } from "./model";
+import {
+  PLATFORM_META,
+  type Platform,
+  type PlatformToneRowProps,
+  type SegmentedFieldProps,
+  type SegmentedOptionProps,
+  type ToneChipProps,
+} from "./model";
 import {
   CUSTOM_INSTRUCTIONS_MAX,
   EMOJI_OPTIONS,
@@ -34,13 +41,6 @@ const PLATFORM_ORDER = Object.keys(PLATFORM_META) as Platform[];
 
 const DEFAULT_OPTION = "__default__";
 
-type ToneOption = (typeof TONE_OPTIONS)[number];
-
-type ChoiceOption<T extends string> = {
-  value: T;
-  label: string;
-};
-
 const countOverrides = (ctaTone: CtaTonePreferences) =>
   PLATFORM_ORDER.filter((platform) => isOverridden(ctaTone, platform)).length;
 
@@ -56,12 +56,6 @@ const disclosureLabel = (open: boolean, count: number) =>
 
 const overrideSummary = (count: number) =>
   `${count} platform${count === 1 ? "" : "s"} customized — changing the default tone above resets them.`;
-
-type ToneChipProps = {
-  option: ToneOption;
-  selected: boolean;
-  onSelect: (tone: Tone) => void;
-};
 
 function ToneChip({ option, selected, onSelect }: ToneChipProps) {
   const ChipComponent = selected ? ChipSelected : Chip;
@@ -102,10 +96,6 @@ function ToneField() {
     </div>
   );
 }
-
-type PlatformToneRowProps = {
-  platform: Platform;
-};
 
 function PlatformToneRow({ platform }: PlatformToneRowProps) {
   const { ctaTone, setPlatformTone, clearPlatformTone } = usePosts();
@@ -176,12 +166,6 @@ function PerPlatformToneField() {
   );
 }
 
-type SegmentedOptionProps<T extends string> = {
-  option: ChoiceOption<T>;
-  selected: boolean;
-  onSelect: (value: T) => void;
-};
-
 function SegmentedOption<T extends string>({
   option,
   selected,
@@ -194,13 +178,6 @@ function SegmentedOption<T extends string>({
     </Item>
   );
 }
-
-type SegmentedFieldProps<T extends string> = {
-  label: string;
-  options: readonly ChoiceOption<T>[];
-  value: T;
-  onSelect: (value: T) => void;
-};
 
 function SegmentedField<T extends string>({
   label,
