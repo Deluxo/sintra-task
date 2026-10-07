@@ -12,14 +12,13 @@ const STATE = mkEnumObject("IDLE", "GENERATING", "ERROR");
 export const GeneratePostsButton = withStateMatch(
   STATE.IDLE,
   ({ chstate }: {
-    chstate: (state: keyof typeof STATE) => (data: any) => typeof data,
-    props?: ComponentProps<"button">
+    chstate: (state: keyof typeof STATE) => (data?: unknown) => unknown;
+    props?: ComponentProps<"button">;
   }, { product }, { generatePosts }) => Promise.resolve(product)
     .then(chstate(STATE.GENERATING))
-    .then(generatePosts)
+    .then(() => generatePosts(product))
     .then(chstate(STATE.IDLE))
-    .catch(chstate(STATE.ERROR))
-    .finally(() => setTimeout(chstate(STATE.IDLE), 5000)),
+    .catch(chstate(STATE.ERROR)),
   {
     [STATE.IDLE]: ({ run, props }) => {
       const productHook = useProduct();
@@ -27,6 +26,23 @@ export const GeneratePostsButton = withStateMatch(
       return <Button {...props} onClick={() => run(productHook, postHook)}>Generate Posts</Button>;
     },
     [STATE.GENERATING]: ({ props }) => <Button {...props} disabled>Generating…</Button>,
-    [STATE.ERROR]: ({ stateData, props }) => <ButtonDanger {...props}>{stateData?.message}</ButtonDanger>,
+    // The error stays on screen until the user retries instead of vanishing
+    // on a timer, so validation messages remain readable.
+    [STATE.ERROR]: ({ stateData, run, props }) => {
+      const productHook = useProduct();
+      const postHook = usePosts();
+      const message = stateData instanceof Error
+        ? stateData.message
+        : "Generation failed";
+      return (
+        <ButtonDanger
+          {...props}
+          title="Click to retry"
+          onClick={() => run(productHook, postHook)}
+        >
+          {message}
+        </ButtonDanger>
+      );
+    },
   }
 );

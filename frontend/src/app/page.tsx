@@ -5,6 +5,7 @@ import { Heading1 } from "../components/atom/typography";
 import { ThemeButton } from "../domain/theme/theme-button";
 import { GeneratePostsButton } from "../domain/post/GeneratePostsButton";
 import { PostsCard } from "../domain/post/PostsCard";
+import { CtaToneForm } from "../domain/post/CtaToneForm";
 import { ProductForm } from "../domain/product/ProductForm";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
       </Row>
 
       <ProductForm />
+      <CtaToneForm />
       <GeneratePostsButton className="w-full"/>
 
       <PostsCard className="mt-8" />
