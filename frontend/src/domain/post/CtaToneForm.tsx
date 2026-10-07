@@ -25,6 +25,7 @@ import {
   effectiveTone,
   isOverridden,
   toneLabel,
+  type CtaTonePreferences,
   type Tone,
 } from "./cta-tone";
 import { usePosts } from "./usePosts";
@@ -33,177 +34,279 @@ const PLATFORM_ORDER = Object.keys(PLATFORM_META) as Platform[];
 
 const DEFAULT_OPTION = "__default__";
 
-export function CtaToneForm(props: ComponentProps<"div">) {
-  const { ctaTone, setTone, setPlatformTone, clearPlatformTone, patchCtaTone } =
-    usePosts();
-  const [showPlatforms, setShowPlatforms] = useState(false);
-  const ctaToggleId = useId();
+type ToneOption = (typeof TONE_OPTIONS)[number];
 
-  const overriddenCount = PLATFORM_ORDER.filter((platform) =>
-    isOverridden(ctaTone, platform)
-  ).length;
+type ChoiceOption<T extends string> = {
+  value: T;
+  label: string;
+};
+
+const countOverrides = (ctaTone: CtaTonePreferences) =>
+  PLATFORM_ORDER.filter((platform) => isOverridden(ctaTone, platform)).length;
+
+const platformSelectValue = (ctaTone: CtaTonePreferences, platform: Platform) =>
+  isOverridden(ctaTone, platform)
+    ? effectiveTone(ctaTone, platform)
+    : DEFAULT_OPTION;
+
+const defaultOptionLabel = (tone: Tone) => `Default (${toneLabel(tone)})`;
+
+const disclosureLabel = (open: boolean, count: number) =>
+  `${open ? "Hide" : "Customize"}${count ? ` (${count})` : ""}`;
+
+const overrideSummary = (count: number) =>
+  `${count} platform${count === 1 ? "" : "s"} customized — changing the default tone above resets them.`;
+
+type ToneChipProps = {
+  option: ToneOption;
+  selected: boolean;
+  onSelect: (tone: Tone) => void;
+};
+
+function ToneChip({ option, selected, onSelect }: ToneChipProps) {
+  const ChipComponent = selected ? ChipSelected : Chip;
+  return (
+    <ChipComponent
+      aria-pressed={selected}
+      onClick={() => onSelect(option.value)}
+    >
+      {option.label}
+    </ChipComponent>
+  );
+}
+
+function ToneField() {
+  const { ctaTone, setTone } = usePosts();
   const selectedTone = TONE_OPTIONS.find(
     (option) => option.value === ctaTone.tone
   );
 
   return (
-    <Stack {...props}>
-      <div>
-        <Label>Tone</Label>
-        <div role="group" aria-label="Tone" className="flex flex-wrap gap-2">
-          {TONE_OPTIONS.map((option) => {
-            const selected = option.value === ctaTone.tone;
-            const ChipComponent = selected ? ChipSelected : Chip;
-            return (
-              <ChipComponent
-                key={option.value}
-                aria-pressed={selected}
-                onClick={() => setTone(option.value)}
-              >
-                {option.label}
-              </ChipComponent>
-            );
-          })}
-        </div>
-        {selectedTone && (
-          <div className="mt-1">
-            <Caption>{selectedTone.hint}</Caption>
-          </div>
-        )}
-      </div>
-
-      <div>
-        <Row className="justify-between">
-          <Label className="mb-0">Per-platform tone</Label>
-          <ButtonGhostSm
-            type="button"
-            aria-expanded={showPlatforms}
-            onClick={() => setShowPlatforms((open) => !open)}
-          >
-            {showPlatforms ? "Hide" : "Customize"}
-            {overriddenCount ? ` (${overriddenCount})` : ""}
-          </ButtonGhostSm>
-        </Row>
-
-        {showPlatforms && (
-          <Stack className="mt-2">
-            {PLATFORM_ORDER.map((platform) => {
-              const overridden = isOverridden(ctaTone, platform);
-              const label = PLATFORM_META[platform].label;
-
-              return (
-                <Row key={platform}>
-                  <Label className="mb-0 grow">{label}</Label>
-                  <Select
-                    className="grow"
-                    aria-label={`${label} tone`}
-                    value={
-                      overridden ? effectiveTone(ctaTone, platform) : DEFAULT_OPTION
-                    }
-                    onChange={(event) => {
-                      const next = event.target.value;
-                      if (next === DEFAULT_OPTION || next === ctaTone.tone) {
-                        clearPlatformTone(platform);
-                      } else {
-                        setPlatformTone(platform, next as Tone);
-                      }
-                    }}
-                  >
-                    <option value={DEFAULT_OPTION}>
-                      Default ({toneLabel(ctaTone.tone)})
-                    </option>
-                    {TONE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-                </Row>
-              );
-            })}
-            {overriddenCount > 0 && (
-              <Caption>
-                {overriddenCount} platform
-                {overriddenCount > 1 ? "s" : ""} customized — changing the default
-                tone above resets them.
-              </Caption>
-            )}
-          </Stack>
-        )}
-      </div>
-
-      <Row>
-        <div>
-          <Label>Emoji usage</Label>
-          <SegmentedControl role="group" aria-label="Emoji usage">
-            {EMOJI_OPTIONS.map((option) => {
-              const selected = option.value === ctaTone.emoji;
-              const Item = selected ? SegmentedItemSelected : SegmentedItem;
-              return (
-                <Item
-                  key={option.value}
-                  aria-pressed={selected}
-                  onClick={() => patchCtaTone({ emoji: option.value })}
-                >
-                  {option.label}
-                </Item>
-              );
-            })}
-          </SegmentedControl>
-        </div>
-
-        <div>
-          <Label>Post length</Label>
-          <SegmentedControl role="group" aria-label="Post length">
-            {LENGTH_OPTIONS.map((option) => {
-              const selected = option.value === ctaTone.length;
-              const Item = selected ? SegmentedItemSelected : SegmentedItem;
-              return (
-                <Item
-                  key={option.value}
-                  aria-pressed={selected}
-                  onClick={() => patchCtaTone({ length: option.value })}
-                >
-                  {option.label}
-                </Item>
-              );
-            })}
-          </SegmentedControl>
-        </div>
-
-        <div>
-          <Label htmlFor={ctaToggleId} className="cursor-pointer">
-            Add a call-to-action
-          </Label>
-          <Toggle
-            id={ctaToggleId}
-            checked={ctaTone.includeCta}
-            onCheckedChange={(checked) => patchCtaTone({ includeCta: checked })}
-            label="Add a call-to-action to every post"
+    <div>
+      <Label>Tone</Label>
+      <div role="group" aria-label="Tone" className="flex flex-wrap gap-2">
+        {TONE_OPTIONS.map((option) => (
+          <ToneChip
+            key={option.value}
+            option={option}
+            selected={option.value === ctaTone.tone}
+            onSelect={setTone}
           />
+        ))}
+      </div>
+      {selectedTone && (
+        <div className="mt-1">
+          <Caption>{selectedTone.hint}</Caption>
         </div>
+      )}
+    </div>
+  );
+}
+
+type PlatformToneRowProps = {
+  platform: Platform;
+};
+
+function PlatformToneRow({ platform }: PlatformToneRowProps) {
+  const { ctaTone, setPlatformTone, clearPlatformTone } = usePosts();
+  const label = PLATFORM_META[platform].label;
+
+  const handleChange = (next: string) => {
+    const tone = TONE_OPTIONS.find((option) => option.value === next)?.value;
+    if (!tone || tone === ctaTone.tone) {
+      clearPlatformTone(platform);
+    } else {
+      setPlatformTone(platform, tone);
+    }
+  };
+
+  return (
+    <FormControlRow
+      className="flex items-center gap-2"
+      label={label}
+      labelProps={{ className: "mb-0 grow" }}
+      InputComponent={Select}
+      inputProps={{
+        className: "grow",
+        "aria-label": `${label} tone`,
+        value: platformSelectValue(ctaTone, platform),
+        onChange: (event: ChangeEvent<HTMLSelectElement>) =>
+          handleChange(event.target.value),
+      }}
+    >
+      <option value={DEFAULT_OPTION}>{defaultOptionLabel(ctaTone.tone)}</option>
+      {TONE_OPTIONS.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </FormControlRow>
+  );
+}
+
+function PerPlatformToneField() {
+  const { ctaTone } = usePosts();
+  const [showPlatforms, setShowPlatforms] = useState(false);
+  const overriddenCount = countOverrides(ctaTone);
+
+  return (
+    <div>
+      <Row className="justify-between">
+        <Label className="mb-0">Per-platform tone</Label>
+        <ButtonGhostSm
+          type="button"
+          aria-expanded={showPlatforms}
+          onClick={() => setShowPlatforms((open) => !open)}
+        >
+          {disclosureLabel(showPlatforms, overriddenCount)}
+        </ButtonGhostSm>
       </Row>
 
-      <FormControlRow
-        label={
-          <Row className="justify-between">
-            <span>Extra instructions</span>
-            <Caption>
-              {(ctaTone.customInstructions ?? "").length}/
-              {CUSTOM_INSTRUCTIONS_MAX}
-            </Caption>
-          </Row>
-        }
-        InputComponent={Textarea}
-        inputProps={{
-          value: ctaTone.customInstructions ?? "",
-          onChange: (event: ChangeEvent<HTMLTextAreaElement>) =>
-            patchCtaTone({ customInstructions: event.target.value }),
-          maxLength: CUSTOM_INSTRUCTIONS_MAX,
-          rows: 2,
-          placeholder: "Mention our free shipping offer",
-        }}
+      {showPlatforms && (
+        <Stack className="mt-2">
+          {PLATFORM_ORDER.map((platform) => (
+            <PlatformToneRow key={platform} platform={platform} />
+          ))}
+          {overriddenCount > 0 && (
+            <Caption>{overrideSummary(overriddenCount)}</Caption>
+          )}
+        </Stack>
+      )}
+    </div>
+  );
+}
+
+type SegmentedOptionProps<T extends string> = {
+  option: ChoiceOption<T>;
+  selected: boolean;
+  onSelect: (value: T) => void;
+};
+
+function SegmentedOption<T extends string>({
+  option,
+  selected,
+  onSelect,
+}: SegmentedOptionProps<T>) {
+  const Item = selected ? SegmentedItemSelected : SegmentedItem;
+  return (
+    <Item aria-pressed={selected} onClick={() => onSelect(option.value)}>
+      {option.label}
+    </Item>
+  );
+}
+
+type SegmentedFieldProps<T extends string> = {
+  label: string;
+  options: readonly ChoiceOption<T>[];
+  value: T;
+  onSelect: (value: T) => void;
+};
+
+function SegmentedField<T extends string>({
+  label,
+  options,
+  value,
+  onSelect,
+}: SegmentedFieldProps<T>) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <SegmentedControl role="group" aria-label={label}>
+        {options.map((option) => (
+          <SegmentedOption
+            key={option.value}
+            option={option}
+            selected={option.value === value}
+            onSelect={onSelect}
+          />
+        ))}
+      </SegmentedControl>
+    </div>
+  );
+}
+
+function EmojiField() {
+  const { ctaTone, patchCtaTone } = usePosts();
+  return (
+    <SegmentedField
+      label="Emoji usage"
+      options={EMOJI_OPTIONS}
+      value={ctaTone.emoji}
+      onSelect={(emoji) => patchCtaTone({ emoji })}
+    />
+  );
+}
+
+function LengthField() {
+  const { ctaTone, patchCtaTone } = usePosts();
+  return (
+    <SegmentedField
+      label="Post length"
+      options={LENGTH_OPTIONS}
+      value={ctaTone.length}
+      onSelect={(length) => patchCtaTone({ length })}
+    />
+  );
+}
+
+function CtaField() {
+  const { ctaTone, patchCtaTone } = usePosts();
+  const toggleId = useId();
+
+  return (
+    <div>
+      <Label htmlFor={toggleId} className="cursor-pointer">
+        Add a call-to-action
+      </Label>
+      <Toggle
+        id={toggleId}
+        checked={ctaTone.includeCta}
+        onCheckedChange={(checked) => patchCtaTone({ includeCta: checked })}
+        label="Add a call-to-action to every post"
       />
+    </div>
+  );
+}
+
+function InstructionsField() {
+  const { ctaTone, patchCtaTone } = usePosts();
+  const instructions = ctaTone.customInstructions ?? "";
+  const counter = `${instructions.length}/${CUSTOM_INSTRUCTIONS_MAX}`;
+
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) =>
+    patchCtaTone({ customInstructions: event.target.value });
+
+  return (
+    <FormControlRow
+      label={
+        <Row className="justify-between">
+          <span>Extra instructions</span>
+          <Caption>{counter}</Caption>
+        </Row>
+      }
+      InputComponent={Textarea}
+      inputProps={{
+        value: instructions,
+        onChange: handleChange,
+        maxLength: CUSTOM_INSTRUCTIONS_MAX,
+        rows: 2,
+        placeholder: "Mention our free shipping offer",
+      }}
+    />
+  );
+}
+
+export function CtaToneForm(props: ComponentProps<"div">) {
+  return (
+    <Stack {...props}>
+      <ToneField />
+      <PerPlatformToneField />
+      <Row>
+        <EmojiField />
+        <LengthField />
+        <CtaField />
+      </Row>
+      <InstructionsField />
     </Stack>
   );
 }

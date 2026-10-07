@@ -17,10 +17,11 @@ export const FormControlRow = ({
   labelProps,
   inputProps,
   InputComponent = Input,
+  children,
   ...props
 }: FormControlRowProps) => (
   <div {...props}>
     <Label {...labelProps}>{label}</Label>
-    <InputComponent {...inputProps} />
+    <InputComponent {...inputProps}>{children}</InputComponent>
   </div>
 );
