@@ -52,6 +52,28 @@ app.post("/api/generate", async (req: Request, res: Response, next: NextFunction
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   if (res.headersSent) return next(error);
 
+  // Body-parser failures are client mistakes, not server failures.
+  const malformedJson = error instanceof SyntaxError && "body" in error;
+  const status =
+    !malformedJson &&
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    Number.isFinite(Number((error as { status?: unknown }).status))
+      ? Number((error as { status?: unknown }).status)
+      : null;
+
+  if (malformedJson || status === 413) {
+    res.status(malformedJson ? 400 : 413).json({
+      error: {
+        message: malformedJson
+          ? "Request body is not valid JSON"
+          : "Request body is too large",
+      },
+    });
+    return;
+  }
+
   console.error(error);
   res.status(500).json({
     error: {
