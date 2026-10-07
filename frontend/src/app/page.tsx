@@ -1,23 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { generatePosts } from "../api";
+import { ChangeEvent, useState } from "react";
 import { Page, Row, Stack } from "../components/atom/layout";
 import { Heading1 } from "../components/atom/typography";
 import { Button, Input, Label, Textarea } from "../components/atom/form";
 import { ThemeButton } from "../domain/theme/theme-button";
 import { usePosts } from "../domain/post/usePosts";
 import { PostsCard } from "../domain/post/PostsCard";
-
-/** @TODO: move interfaces etc to better fitting file structure */
-/** @TODO: refactor <div><label><input></div> into a molecule */
-
-interface Product {
-  name: string;
-  description: string;
-  price: number;
-  category?: string;
-}
+import type { Product } from "../domain/post/model";
+import { FormControlRow } from "@/components/atom/molecule/FormControl";
 
 export default function Home() {
   const [product, setProduct] = useState<Product>({
@@ -27,12 +18,7 @@ export default function Home() {
     category: "",
   });
 
-  const { setPosts } = usePosts();
-
-  const handleGeneratePosts = async () => {
-    const result = await generatePosts(product);
-    setPosts(result.posts);
-  };
+  const { generatePosts } = usePosts();
 
   return (
     <Page>
@@ -42,56 +28,37 @@ export default function Home() {
       </Row>
 
       <Stack className="mb-8">
-        <div>
-          <Label>Product Name</Label>
-          <Input
-            type="text"
-            value={product.name}
-            onChange={(e) => setProduct({ ...product, name: e.target.value })}
-            placeholder="EcoBottle Pro"
-          />
-        </div>
+        <FormControlRow label="Product Name" inputProps={{
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, name: e.target.value }),
+          value: product.name,
+          placeholder: "EcoBottle Pro",
+        }} />
 
-        <div>
-          <Label>Description</Label>
-          <Textarea
-            rows={4}
-            value={product.description}
-            onChange={(e) =>
-              setProduct({ ...product, description: e.target.value })
-            }
-            placeholder="Revolutionary reusable water bottle with built-in UV purification..."
-          />
-        </div>
+        <FormControlRow label="Product Name" InputComponent={Textarea} inputProps={{
+          onChange: (e: ChangeEvent<HTMLTextAreaElement>) => setProduct({ ...product, name: e.target.value }),
+          value: product.description,
+          placeholder: "Revolutionary reusable water bottle with built-in UV purification...",
+          rows: 4,
+        }} />
 
-        <div>
-          <Label>Price</Label>
-          <Input
-            type="number"
-            value={product.price}
-            onChange={(e) =>
-              setProduct({ ...product, price: parseFloat(e.target.value) || 0 })
-            }
-            placeholder="49.99"
-          />
-        </div>
+        <FormControlRow label="Price" inputProps={{
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, price: parseFloat(e.target.value) || 0 }),
+          type: "number",
+          value: product.price,
+          placeholder: "49.99",
+        }} />
 
-        <div>
-          <Label>Category (optional)</Label>
-          <Input
-            type="text"
-            value={product.category || ""}
-            onChange={(e) =>
-              setProduct({ ...product, category: e.target.value })
-            }
-            placeholder="Health & Wellness"
-          />
-        </div>
+        <FormControlRow label="Category (optional)" inputProps={{
+          onChange: (e: ChangeEvent<HTMLInputElement>) => setProduct({ ...product, category: e.target.value }),
+          value: product.category || "",
+          placeholder: "Health & Wellness",
+        }} />
+
       </Stack>
 
-      <Button onClick={handleGeneratePosts}>Generate Posts</Button>
+      <Button onClick={() => generatePosts(product)}>Generate Posts</Button>
 
-      <PostsCard className="mt-8"/>
+      <PostsCard className="mt-8" />
     </Page>
   );
 }
