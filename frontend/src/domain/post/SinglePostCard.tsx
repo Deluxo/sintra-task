@@ -9,24 +9,21 @@ import {
 } from "../../components/atom/typography";
 import { Card } from "../../components/atom/surface";
 import { CopyButton } from "../../components/copy-button";
-import type { SocialMediaPost } from "./model";
-
-const PLATFORM_ICONS: Record<SocialMediaPost["platform"], string> = {
-  Twitter: "𝕏",
-  Instagram: "📷",
-  Linkedin: "💼",
-};
+import { PLATFORM_META, SocialMediaPost } from "./model";
 
 export function SinglePostCard({ post }: { post: SocialMediaPost }) {
+  // Cached posts may predate platform normalisation, so fall back gracefully.
+  const meta = PLATFORM_META[post.platform] ?? { label: post.platform, icon: "•" };
+
   return (
     <Card>
       <Row className="mb-2 justify-between">
         <Row>
-          <Icon>{PLATFORM_ICONS[post.platform]}</Icon>
-          <Badge>{post.platform}</Badge>
+          <Icon>{meta.icon}</Icon>
+          <Badge>{meta.label}</Badge>
           <Caption>{post.content.length} chars</Caption>
         </Row>
-        <CopyButton text={post.content} label={`${post.platform} post`} />
+        <CopyButton text={post.content} label={`${meta.label} post`} />
       </Row>
       <Text>{post.content}</Text>
     </Card>
