@@ -9,12 +9,29 @@ export function usePosts() {
     throw new Error("usePosts must be used within a PostsProvider");
   }
 
-  const { posts, setPosts } = context;
+  const {
+    posts,
+    setPosts,
+    ctaTone,
+    setTone,
+    setPlatformTone,
+    clearPlatformTone,
+    patchCtaTone,
+  } = context;
 
   const generatePosts = async (product: Product): Promise<void> => {
-    const result = await requestGeneratePosts(product);
+    const result = await requestGeneratePosts(product, ctaTone);
     setPosts(result.posts);
   };
 
-  return { posts, setPosts, generatePosts };
+  return {
+    posts,
+    setPosts,
+    ctaTone,
+    setTone,
+    setPlatformTone,
+    clearPlatformTone,
+    patchCtaTone,
+    generatePosts,
+  };
 }
